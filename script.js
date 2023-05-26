@@ -19,10 +19,6 @@ newTab.document.write(`
           font-weight: bold;
           font-size: 18px;
         }
-
-        .offline-duration {
-          font-size: 14px;
-        }
       </style>
     </head>
     <body>
@@ -54,11 +50,14 @@ fetch('https://steamcommunity.com/my/friends')
         // Extract friend name
         const name = panel.querySelector('.friend_block_content').textContent.trim();
 
+        // Add " | " before the occurrence of "Last" in the friend name
+        const modifiedName = name.replace(/Last/g, ' | Last');
+
         // Extract friend offline duration
         const offlineDuration = offlineElement.textContent.trim();
 
         // Add friend data to the array
-        friendData.push({ name, offlineDuration });
+        friendData.push({ name: modifiedName, offlineDuration });
       }
     });
 
@@ -69,7 +68,7 @@ fetch('https://steamcommunity.com/my/friends')
       return durationB - durationA;
     });
 
-    // Display sorted friend data
+    // Display sorted friend names
     const friendListDiv = newTab.document.getElementById('friend-list');
     friendData.forEach(friend => {
       const friendInfoDiv = newTab.document.createElement('div');
@@ -79,12 +78,7 @@ fetch('https://steamcommunity.com/my/friends')
       friendNameDiv.classList.add('friend-name');
       friendNameDiv.textContent = friend.name;
 
-      const offlineDurationDiv = newTab.document.createElement('div');
-      offlineDurationDiv.classList.add('offline-duration');
-      offlineDurationDiv.textContent = friend.offlineDuration;
-
       friendInfoDiv.appendChild(friendNameDiv);
-      friendInfoDiv.appendChild(offlineDurationDiv);
       friendListDiv.appendChild(friendInfoDiv);
     });
   })
