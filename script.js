@@ -5,19 +5,36 @@ newTab.document.write(`
     <head>
       <style>
         body {
-          background-color: #1f1f1f;
-          color: #ffffff;
+          background-color: #2e3440;
+          color: #eceff4;
           font-family: Arial, sans-serif;
           text-align: center;
         }
 
-        .friend-info {
+        .friend-card {
+          background-color: #3b4252;
+          color: #eceff4;
+          padding: 10px;
           margin-bottom: 20px;
+          border-radius: 8px;
+          display: inline-block;
+          margin-right: 10px;
+          max-width: 200px; /* Added max-width property */
+          border: 1px solid #4c566a; /* Added border property */
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added box-shadow property */
+        }
+
+        .friend-avatar {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          margin-bottom: 10px;
         }
 
         .friend-name {
           font-weight: bold;
-          font-size: 18px;
+          font-size: 14px;
+          margin-bottom: 5px;
         }
       </style>
     </head>
@@ -56,8 +73,11 @@ fetch('https://steamcommunity.com/my/friends')
         // Extract friend offline duration
         const offlineDuration = offlineElement.textContent.trim();
 
+        // Extract friend avatar
+        const avatar = panel.querySelector('.player_avatar.friend_block_link_overlay.offline img').src;
+
         // Add friend data to the array
-        friendData.push({ name: modifiedName, offlineDuration });
+        friendData.push({ name: modifiedName, offlineDuration, avatar });
       }
     });
 
@@ -68,18 +88,23 @@ fetch('https://steamcommunity.com/my/friends')
       return durationB - durationA;
     });
 
-    // Display sorted friend names
+    // Display sorted friend list in card fashion
     const friendListDiv = newTab.document.getElementById('friend-list');
     friendData.forEach(friend => {
-      const friendInfoDiv = newTab.document.createElement('div');
-      friendInfoDiv.classList.add('friend-info');
+      const friendCardDiv = newTab.document.createElement('div');
+      friendCardDiv.classList.add('friend-card');
+
+      const friendAvatarImg = newTab.document.createElement('img');
+      friendAvatarImg.classList.add('friend-avatar');
+      friendAvatarImg.src = friend.avatar;
 
       const friendNameDiv = newTab.document.createElement('div');
       friendNameDiv.classList.add('friend-name');
       friendNameDiv.textContent = friend.name;
 
-      friendInfoDiv.appendChild(friendNameDiv);
-      friendListDiv.appendChild(friendInfoDiv);
+      friendCardDiv.appendChild(friendAvatarImg);
+      friendCardDiv.appendChild(friendNameDiv);
+      friendListDiv.appendChild(friendCardDiv);
     });
   })
   .catch(error => {
