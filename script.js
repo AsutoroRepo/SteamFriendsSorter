@@ -11,36 +11,67 @@ newTab.document.write(`
           text-align: center;
         }
 
+        .friend-list {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
         .friend-card {
           background-color: #3b4252;
           color: #eceff4;
           padding: 10px;
-          margin-bottom: 20px;
+          margin: 10px;
           border-radius: 8px;
-          display: inline-block;
-          margin-right: 10px;
-          max-width: 200px; /* Added max-width property */
-          border: 1px solid #4c566a; /* Added border property */
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added box-shadow property */
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 200px;
+          border: 1px solid #4c566a;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transition: box-shadow 0.3s ease;
         }
 
         .friend-avatar {
-          width: 50px;
-          height: 50px;
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           margin-bottom: 10px;
+          transition: filter 0.3s ease;
         }
 
         .friend-name {
           font-weight: bold;
           font-size: 14px;
           margin-bottom: 5px;
+          transition: color 0.3s ease;
+        }
+
+        .friend-card a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        .friend-card:hover {
+          padding: 14px;
+          transition: padding 0.3s ease;
+          box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .friend-card:hover .friend-avatar {
+          filter: brightness(110%);
+          transition: filter 0.3s ease;
+        }
+
+        .friend-card:hover .friend-name {
+          color: #88c0d0;
+          transition: color 0.3s ease;
         }
       </style>
     </head>
     <body>
       <h1>Steam Friend List</h1>
-      <div id="friend-list"></div>
+      <div class="friend-list" id="friend-list"></div>
     </body>
   </html>
 `);
@@ -73,11 +104,14 @@ fetch('https://steamcommunity.com/my/friends')
         // Extract friend offline duration
         const offlineDuration = offlineElement.textContent.trim();
 
-        // Extract friend avatar
-        const avatar = panel.querySelector('.player_avatar.friend_block_link_overlay.offline img').src;
+        // Extract friend profile URL
+        const profileURL = panel.querySelector('.selectable_overlay').getAttribute('href');
+
+        // Extract friend avatar URL
+        const avatar = panel.querySelector('.player_avatar.friend_block_link_overlay.offline img').getAttribute('src');
 
         // Add friend data to the array
-        friendData.push({ name: modifiedName, offlineDuration, avatar });
+        friendData.push({ name: modifiedName, offlineDuration, profileURL, avatar });
       }
     });
 
@@ -88,11 +122,15 @@ fetch('https://steamcommunity.com/my/friends')
       return durationB - durationA;
     });
 
-    // Display sorted friend list in card fashion
+    // Display sorted friend names with avatars
     const friendListDiv = newTab.document.getElementById('friend-list');
     friendData.forEach(friend => {
       const friendCardDiv = newTab.document.createElement('div');
       friendCardDiv.classList.add('friend-card');
+
+      const friendLink = newTab.document.createElement('a');
+      friendLink.href = friend.profileURL;
+      friendLink.target = '_blank';
 
       const friendAvatarImg = newTab.document.createElement('img');
       friendAvatarImg.classList.add('friend-avatar');
@@ -102,8 +140,9 @@ fetch('https://steamcommunity.com/my/friends')
       friendNameDiv.classList.add('friend-name');
       friendNameDiv.textContent = friend.name;
 
-      friendCardDiv.appendChild(friendAvatarImg);
-      friendCardDiv.appendChild(friendNameDiv);
+      friendLink.appendChild(friendAvatarImg);
+      friendLink.appendChild(friendNameDiv);
+      friendCardDiv.appendChild(friendLink);
       friendListDiv.appendChild(friendCardDiv);
     });
   })
